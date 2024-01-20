@@ -1,4 +1,5 @@
 var core = {};
+var me = 0;
 
 // various common utilities
 
