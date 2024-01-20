@@ -1,5 +1,6 @@
 var core = {};
-var me = 0;
+var completedEpisodes = 0; // Counter for completed episodes
+
 
 // various common utilities
 
@@ -139,6 +140,13 @@ core.endEpisode = function(reward, time_proportional, reason) {
   //setTimeout(function(){
   //  core.startEpisode();
   //}, 500);
+
+  completedEpisodes++; // Increment the episode counter
+
+  // Check if two episodes have been completed
+  if (completedEpisodes >= 2) {
+    window.location.href = '/Users/encord/Documents/Code/Genie/genie_data_final/dataset_creation_final/miniwob/html/miniwob/click-menu-2.html'; // Redirect to another HTML file
+  }
 
   // With the sync screen, the timeout above is redundant
   core.startEpisode();
