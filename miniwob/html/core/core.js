@@ -1,6 +1,19 @@
 var core = {};
+var currentHtmlIndex = localStorage.getItem('currentHtmlIndex');
+if (currentHtmlIndex === null) {
+  currentHtmlIndex = 0;
+} else {
+  currentHtmlIndex = parseInt(currentHtmlIndex, 10); // Convert to integer
+}
 var completedEpisodes = 0; // Counter for completed episodes
-
+// Current index for the HTML files array
+var htmlFiles = [
+    '/Users/encord/Documents/Code/Genie/genie_data_final/dataset_creation_final/miniwob/html/miniwob/choose-date-easy.html',
+  '/Users/encord/Documents/Code/Genie/genie_data_final/dataset_creation_final/miniwob/html/miniwob/choose-date-medium.html',
+  '/Users/encord/Documents/Code/Genie/genie_data_final/dataset_creation_final/miniwob/html/miniwob/click-tab-2-easy.html',
+  '/Users/encord/Documents/Code/Genie/genie_data_final/dataset_creation_final/miniwob/html/miniwob/click-tab-2-medium.html',
+  '/Users/encord/Documents/Code/Genie/genie_data_final/dataset_creation_final/miniwob/html/miniwob/click-test-transfer.html'
+];
 
 // various common utilities
 
@@ -78,6 +91,7 @@ core.startEpisode = function() {
     core.cover_div.setAttribute('id', 'sync-task-cover');
     core.cover_div.innerHTML = 'START';
     core.cover_div.onclick = function () {
+      console.log("start clicked")
       core.startEpisodeReal();
     };
     document.body.appendChild(core.cover_div);
@@ -92,6 +106,7 @@ core.startEpisodeReal = function () {
   WOB_REWARD_GLOBAL = 0;
   WOB_RAW_REWARD_GLOBAL = 0;
   WOB_REWARD_REASON = null;
+  core.updateDisplay(0)
   core.clearUserSelection();
   core.canvasClear();
   document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -106,6 +121,7 @@ core.startEpisodeReal = function () {
 }
 
 core.endEpisode = function(reward, time_proportional, reason) {
+  console.log("episode hash ended")
   // stop timer and set to null, so that only one event gets rewarded
   // for any given episode.
   if(core.EP_TIMER !== null) {
@@ -132,7 +148,9 @@ core.endEpisode = function(reward, time_proportional, reason) {
   WOB_EPISODE_ID++;
   document.getElementById('episode-id').innerHTML = WOB_EPISODE_ID;
   console.log('reward: ' + WOB_REWARD_GLOBAL + ' (raw: ' + WOB_RAW_REWARD_GLOBAL + ')');
+  console.log("before update display")
   core.updateDisplay(reward);
+  console.log("after update display")
   core.clearTimer();
 
   // start a new problem with a new timer. add a slight delay so that the problem
@@ -140,13 +158,29 @@ core.endEpisode = function(reward, time_proportional, reason) {
   //setTimeout(function(){
   //  core.startEpisode();
   //}, 500);
-
   completedEpisodes++; // Increment the episode counter
-
-  // Check if two episodes have been completed
-  if (completedEpisodes >= 2) {
-    window.location.href = '/Users/encord/Documents/Code/Genie/genie_data_final/dataset_creation_final/miniwob/html/miniwob/click-menu-2.html'; // Redirect to another HTML file
+   // Check if two episodes have been completed
+   if (completedEpisodes >= 3) {
+    // Reset the counter
+    completedEpisodes = 0;
+  
+    // Add a wait time (in milliseconds) before redirecting
+    var waitTime = 3000; // 3 seconds (adjust as needed)
+  
+    setTimeout(function() {
+      // Redirect to the current HTML file
+      window.location.href = htmlFiles[currentHtmlIndex];
+      console.log("href", htmlFiles[currentHtmlIndex]);
+  
+      // Move to the next HTML file
+      currentHtmlIndex = (currentHtmlIndex + 1) % htmlFiles.length;
+  
+      // Save the updated index in localStorage
+      localStorage.setItem('currentHtmlIndex', currentHtmlIndex);
+    }, waitTime);
   }
+  console.log("completed episodes index",completedEpisodes)
+  console.log("index_counter",currentHtmlIndex)
 
   // With the sync screen, the timeout above is redundant
   core.startEpisode();
